@@ -1,0 +1,31 @@
+Group hierarchy,Region,Description,Service,Upfront,Monthly,First 12 months total,Currency,Configuration summary
+My Estimate,US East (N. Virginia),,Amazon EC2,0,737.197983,8846.38,USD,"Operating system (Linux), Storage for each EC2 instance (Throughput Optimized HDD (st 1)), Storage amount (100 GB), Snapshot Frequency (2x Daily), Amount changed per snapshot (3 GB), DT Inbound: Not selected (0 TB per month) 
+, DT Outbound: Not selected (0 TB per month) 
+, DT Intra-Region: (0 TB per month) 
+, Workload (Daily, (Workload days: Sunday, Monday, Tuesday, Wednesday, Thursday, Friday, Saturday, Baseline: 1, Peak: 6, Duration of peak: 8 Hr 30 Min)), Data transfer cost (0), Advance EC2 instance (c4.2xlarge), Pricing strategy (On-Demand and Reserved 1 Year  None upfront)"
+My Estimate,US East (N. Virginia),,Amazon EC2,0,111.56967399999999,1338.84,USD,"Operating system (Linux), Storage for each EC2 instance (Throughput Optimized HDD (st 1)), Storage amount (100 GB), Snapshot Frequency (2x Daily), Amount changed per snapshot (3 GB), Workload (Daily, (Workload days: Sunday, Monday, Tuesday, Wednesday, Thursday, Friday, Saturday, Baseline: 1, Peak: 6, Duration of peak: 8 Hr 30 Min)), Data transfer cost (0), Advance EC2 instance (t3.medium), Pricing strategy (On-Demand and Reserved 1 Year  None upfront)"
+My Estimate,US East (N. Virginia),,Amazon RDS for MySQL,0,1396.72,16760.64,USD,"Quantity (1), Pricing strategy (Standard Reserved Instances 1 Year No Upfront), Storage for each RDS instance (General Purpose SSD (gp2)), Storage amount (1024 GB), Instance type (db.m5.8xlarge)"
+My Estimate,US East (N. Virginia),,S3 Standard,0,1265.5,15186.00,USD,S3 Standard storage (48 TB per month)
+My Estimate,US East (N. Virginia),,S3 Standard - Infrequent Access,0,421.1,5053.20,USD,S3 Infrequent Access storage (24 TB per month)
+My Estimate,US East (N. Virginia),,Data Transfer,0,0,0.00,USD,"DT Inbound: Internet (0 TB per month) 
+, DT Outbound: Amazon Cloud Front (0 GB per month) 
+, Data transfer cost (0)"
+My Estimate,US East (N. Virginia),,Amazon Virtual Private Cloud (VPC),0,493.65,5923.80,USD,Number of NAT Gateways (1)
+My Estimate,US East (N. Virginia),,Elastic Load Balancing,0,630.8299999999999,7569.96,USD,Number of Application Load Balancers (1)
+My Estimate,US East (N. Virginia),,Elastic Load Balancing,0,630.8399999999999,7570.08,USD,"Number of Network Load Balancers (1), Processed bytes per NLB for TCP (5 GB per month), Processed bytes per NLB for TLS (100 TB per month)"
+My Estimate,US East (N. Virginia),,Elastic Load Balancing,0,630.8299999999999,7569.96,USD,Number of Application Load Balancers (1)
+
+
+
+"AWS Pricing Calculator provides only an estimate of your AWS fees and doesn't include any taxes that might apply. Your actual fees depend on a variety of factors, including your actual usage of AWS services."
+
+
+Write Up
+--------
+EC2 instances, RDS and S3 storage were identified as resources that could be changed in order to reduce cost. As a consequence of this, the performance and redudancy of the application would be adversely affected. EC2 instance type was kept the same, however the number of maximum instances was reduced to 6 from 8 for both web and application servers, and the storage for the instance was changed to Throughput Optimized HDD. The cost of RDS was reduced by about 65% by removing the Mult-AZ read replica and downgrading the instance to a db.m5.8xlarge from a db.m5.12xlarge. The final savings was made by reducing the amount of data stored in S3 Standard storage and significantly reducing the amount of data backed up to S3 Glacier. 
+
+The rationale here is that user interaction with the application will remain the same and therefore the traffic would stay the same as the estimate in the "Initial Cost Estimate". Therefore the traffic estimations for the load balancers and NAT Gateway will stay the same. The remaining resources were EC2 instances, RDS and S3. Hence, these services were downgraded to reduce cost. The performance of the application could become a problem as the maximum number of EC2 instance was reduced and RDS instance was downgraded. The lack of a read replica for the database means that a database outage will take longer to recover as backups from the automated backups will need to be used to deploy a new RDS instance. 
+
+S3 bucket will store the frontend web application, images and videos. The frontend web application will be negligible in size compared to the total storage taken up by images and videos. Therefore estimations for images and videos were done. It was assumed that 50,000 users would on average upload 5 images a day. An image was sized at 150 KB. Therefore for one month estimated as 30 days, the total images uploaded is equal to 50,000 users * 5 images * 150KB * 30 days which is equal to about 1 TB. It was assumed that 50,000 users would upload 5 videos a month, which is almost one a week. One video was sized at 200 MB. Therefore video uploads equal to 50,000 users * 5 videos * 200 MB which is equal to approximately 47 TB. 
+
+In order to provide a better estimate of resources, a more detailed scope of the social media application needs to be taken into account. A serverless option should also be explored to find out whether there could be cost savings. Another option to consider is the AWS Aurora serverless database which may provide a cost savings due to its elasticity. 
